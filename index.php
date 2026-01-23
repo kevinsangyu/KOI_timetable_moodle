@@ -61,4 +61,113 @@ foreach ($records as $r) {
 
 echo html_writer::table($table);
 
+// Draw timetable
+$weekoffset = optional_param('week', 0, PARAM_INT); // +1, -1, etc.
+
+$today = strtotime('today');
+$monday = strtotime("monday this week", $today);
+$monday = strtotime("{$weekoffset} week", $monday);
+$sunday = strtotime("sunday this week", $monday);
+
+$week = [];
+
+foreach ($records as $r) {
+
+    // Skip classes not running this week
+    if ($r->enddate < $monday || $r->startdate > $sunday) {
+        continue;
+    }
+
+    $weekday = (int)date('N', $r->startdate);
+
+    $startminutes =
+        intval(substr($r->timestart, 0, 2)) * 60 +
+        intval(substr($r->timestart, 2, 2));
+
+    $endminutes =
+        intval(substr($r->timeend, 0, 2)) * 60 +
+        intval(substr($r->timeend, 2, 2));
+
+    $week[$weekday][] = (object)[
+        'group' => $r->groupname,
+        'start' => $startminutes,
+        'end'   => $endminutes,
+        'room'  => $r->building . ' ' . $r->room
+    ];
+}
+
+echo '<div class="week-header">';
+
+$prevurl = new moodle_url('/local/koitimetable/index.php', [
+    'week' => $weekoffset - 1
+]);
+
+$nexturl = new moodle_url('/local/koitimetable/index.php', [
+    'week' => $weekoffset + 1
+]);
+
+echo html_writer::link($prevurl, "← Previous week", ['class' => 'week-nav']);
+echo '&nbsp;&nbsp;&nbsp;';
+echo html_writer::link($nexturl, "Next week →", ['class' => 'week-nav']);
+echo '<br>';
+echo html_writer::span(
+    userdate($monday, '%d %b') . ' to ' . userdate($sunday, '%d %b %Y'),
+    'week-range'
+);
+
+echo '</div>';
+$days = [
+    1 => 'Monday',
+    2 => 'Tuesday',
+    3 => 'Wednesday',
+    4 => 'Thursday',
+    5 => 'Friday',
+    6 => 'Saturday'
+];
+
+echo '<div class="timetable-horizontal">';
+
+/* Time header */
+echo '<div class="time-header">';
+echo '<div class="day-label"></div>'; // empty corner
+
+for ($t = 9; $t <= 20; $t++) {
+    echo '<div class="time-slot">' . sprintf('%02d:00', $t) . '</div>';
+}
+echo '</div>';
+
+/* Day rows */
+foreach ($days as $daynum => $dayname) {
+
+    echo '<div class="day-row">';
+    echo '<div class="day-label">' . $dayname . '</div>';
+
+    echo '<div class="day-track">';
+
+    if (!empty($week[$daynum])) {
+        foreach ($week[$daynum] as $c) {
+
+            $left  = ($c->start - (9*60*1)) * 2;
+            $width = ($c->end - $c->start) * 2; // double the scale, i.e. 1 min = 0.5px
+
+            echo html_writer::div(
+                '<strong>' . s(substr($c->group, 0, 6)) . '</strong><br>' . s($c->room),
+                'class-block',
+                [
+                    'style' => "
+                        left: {$left}px;
+                        width: {$width}px;
+                    "
+                ]
+            );
+        }
+    }
+
+    echo '</div>'; // day-track
+    echo '</div>'; // day-row
+}
+
+echo '</div>';
+
+
 echo $OUTPUT->footer();
