@@ -47,17 +47,20 @@ foreach ($groupnames as $groupname) {
     $records = array_merge($records, $DB->get_records_sql($sql, $params));
 }
 
-// 3. Render
+// Uncomment if you want to see a simple table output
 $table = new html_table();
 $table->head = ['Group', 'Date', 'Time', 'Location'];
 
 foreach ($records as $r) {
+    // padding for times before 10am, as there's only 5 characters instead of 6...
+    $start = str_pad($r->timestart, 6, '0', STR_PAD_LEFT);
+    $end = str_pad($r->timeend, 6, '0', STR_PAD_LEFT);
     $table->data[] = [
         s($r->groupname),
         userdate($r->startdate, '%d %b %Y'),
-        substr($r->timestart, 0, 2) . ':' . substr($r->timestart, 2, 2)
+        substr($start, 0, 2) . ':' . substr($start, 2, 2)
         . ' – ' .
-        substr($r->timeend, 0, 2) . ':' . substr($r->timeend, 2, 2),
+        substr($end, 0, 2) . ':' . substr($end, 2, 2),
         s($r->building . ' ' . $r->room)
     ];
 }
@@ -82,14 +85,16 @@ foreach ($records as $r) {
     }
 
     $weekday = (int)date('N', $r->startdate);
+    // padding for times before 10am, as there's only 5 characters instead of 6...
+    $start = str_pad($r->timestart, 6, '0', STR_PAD_LEFT);
+    $end = str_pad($r->timeend, 6, '0', STR_PAD_LEFT);
 
     $startminutes =
-        intval(substr($r->timestart, 0, 2)) * 60 +
-        intval(substr($r->timestart, 2, 2));
-
+        intval(substr($start, 0, 2)) * 60 +
+        intval(substr($start, 2, 2));
     $endminutes =
-        intval(substr($r->timeend, 0, 2)) * 60 +
-        intval(substr($r->timeend, 2, 2));
+        intval(substr($end, 0, 2)) * 60 +
+        intval(substr($end, 2, 2));
 
     $week[$weekday][] = (object)[
         'group' => $r->groupname,

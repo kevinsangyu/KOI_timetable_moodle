@@ -99,7 +99,7 @@ if ($form->is_cancelled()) {
 
     foreach ($lines as $line) {
         if (count($line) < count($headers)) {
-            $skipped++;    
+            $skipped++;
             continue; // skip broken rows
         }
 
