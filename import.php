@@ -63,16 +63,14 @@ if ($form->is_cancelled()) {
     $headers = array_shift($lines);
 
     $requiredheaders = [
-        'CLS_STREAM_DESC',
-        'CLASS_START_DT',
-        'CLASS_END_DT',
-        'CLASS_START_TIME',
-        'CLASS_END_TIME',
+        'CLS_BKG_CMT',
+        'CLS_BKG_START_DT',
+        'CLS_BKG_END_DT',
+        'CLS_BKG_DAY',
+        'CLS_BKG_START_TIME',
+        'CLS_BKG_END_TIME',
         'BUILDING_ID',
-        'ROOM_ID',
-        'CLS_STREAM_ID',
-        'AVAIL_YR',
-        'SPRD_CD'
+        'ROOM_ID'
     ];
 
     $missing = array_diff($requiredheaders, $headers);
@@ -113,18 +111,17 @@ if ($form->is_cancelled()) {
         // Validate fields
         //If any required fields are empty, skip the row
         if (
-            empty($row['CLS_STREAM_DESC']) ||
-            empty($row['CLASS_START_DT']) ||
-            empty($row['CLASS_END_DT']) ||
-            empty($row['CLS_STREAM_ID'])
+            empty($row['CLS_BKG_START_DT']) ||
+            empty($row['CLS_BKG_END_DT']) ||
+            empty($row['CLS_BKG_CMT'])
         ) {
             $skipped++;
             continue;
         }
 
         // If the classes end before they start, skip the row
-        $startdate = strtotime($row['CLASS_START_DT']);
-        $enddate   = strtotime($row['CLASS_END_DT']);
+        $startdate = strtotime($row['CLS_BKG_START_DT']);
+        $enddate   = strtotime($row['CLS_BKG_END_DT']);
 
         if (!$startdate || !$enddate || $enddate < $startdate) {
             $skipped++;
@@ -133,16 +130,13 @@ if ($form->is_cancelled()) {
 
         // Create record and insert
         $record = new stdClass();
-        $record->groupname = $row['CLS_STREAM_DESC'];
-        $record->startdate = strtotime($row['CLASS_START_DT']);
-        $record->enddate   = strtotime($row['CLASS_END_DT']);
-        $record->timestart = (int)$row['CLASS_START_TIME'];
-        $record->timeend   = (int)$row['CLASS_END_TIME'];
+        $record->groupname = $row['CLS_BKG_CMT'];
+        $record->startdate = strtotime($row['CLS_BKG_START_DT']);
+        $record->enddate   = strtotime($row['CLS_BKG_END_DT']);
+        $record->timestart = (int)$row['CLS_BKG_START_TIME'];
+        $record->timeend   = (int)$row['CLS_BKG_END_TIME'];
         $record->building  = $row['BUILDING_ID'];
         $record->room      = $row['ROOM_ID'];
-        $record->streamid  = (int)$row['CLS_STREAM_ID'];
-        $record->year      = (int)$row['AVAIL_YR'];
-        $record->studyperiod = (int)$row['SPRD_CD'];
         // consider adding class type, lecturer...
 
         try {

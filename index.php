@@ -24,25 +24,28 @@ $groupnames = [];
 foreach ($courses as $course) {
     $groups = groups_get_all_groups($course->id, $USER->id);
     $groupnames = array_merge($groupnames, array_map(fn($g) => $g->name, $groups));
-    echo '<h2>Course ' . $course->shortname . ' Groups: ' . implode(', ', $groupnames) . '</h2>';
 }
 if (empty($groupnames)) {
     echo $OUTPUT->notification('You are not enrolled in any classes.', 'notifyinfo');
     echo $OUTPUT->footer();
     exit;
-}   
+}
+echo '<h2>Showing timetable for groups: ' . implode(', ', $groupnames) . '</h2>';
 
+$records = [];
 // 2. Query timetable
-list($sqlin, $params) = $DB->get_in_or_equal($groupnames, SQL_PARAMS_NAMED);
+foreach ($groupnames as $groupname) {
+    list($sqlin, $params) = $DB->get_in_or_equal($groupname, SQL_PARAMS_NAMED);
 
-$sql = "
-    SELECT *
-    FROM {local_koitimetable}
-    WHERE groupname $sqlin
-    ORDER BY startdate, timestart
-";
+    $sql = "
+        SELECT *
+        FROM {local_koitimetable}
+        WHERE groupname $sqlin
+        ORDER BY startdate, timestart
+    ";
 
-$records = $DB->get_records_sql($sql, $params);
+    $records = array_merge($records, $DB->get_records_sql($sql, $params));
+}
 
 // 3. Render
 $table = new html_table();

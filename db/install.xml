@@ -4,8 +4,6 @@
     <TABLE NAME="local_koitimetable" COMMENT="Imported timetable">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="year" TYPE="int" LENGTH="4" NOTNULL="true"/>
-        <FIELD NAME="studyperiod" TYPE="char" LENGTH="2" NOTNULL="true"/>
         <FIELD NAME="groupname" TYPE="char" LENGTH="100" NOTNULL="true"/>
         <FIELD NAME="startdate" TYPE="int" LENGTH="10" NOTNULL="true"/>
         <FIELD NAME="enddate" TYPE="int" LENGTH="10" NOTNULL="true"/>
