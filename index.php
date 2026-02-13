@@ -109,7 +109,8 @@ foreach ($records as $r) {
         'group' => substr($r->groupname, 0, 6) . ' - ' . ($r->activity == 1 ? 'Lecture' : 'Tutorial'),
         'start' => $startminutes,
         'end'   => $endminutes,
-        'room'  => $r->building . ' ' . $r->room
+        'room'  => $r->building . ' ' . $r->room,
+        'activity' => $r->activity
     ];
 }
 
@@ -167,16 +168,29 @@ foreach ($days as $daynum => $dayname) {
             $left  = ($c->start - (9*60*1)) * 2;
             $width = ($c->end - $c->start) * 2; // double the scale, i.e. 1 min = 0.5px
 
-            echo html_writer::div(
-                '<strong>' . $c->group . '</strong><br>' . s($c->room),
-                'class-block',
-                [
-                    'style' => "
-                        left: {$left}px;
-                        width: {$width}px;
-                    "
-                ]
-            );
+            if ($c->activity == 1) {
+                echo html_writer::div(
+                    '<strong>' . $c->group . '</strong><br>' . s($c->room),
+                    'class-block',
+                    [
+                        'style' => "
+                            left: {$left}px;
+                            width: {$width}px;
+                        "
+                    ]
+                );
+            } else {
+                echo html_writer::div(
+                    '<strong>' . $c->group . '</strong><br>' . s($c->room),
+                    'class-block-tutorial',
+                    [
+                        'style' => "
+                            left: {$left}px;
+                            width: {$width}px;
+                        "
+                    ]
+                );
+            }
         }
     }
 

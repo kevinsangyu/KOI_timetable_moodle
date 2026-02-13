@@ -52,3 +52,17 @@
     overflow: visible;
     z-index: 1;
 }
+
+.class-block-tutorial {
+    position: absolute;
+    top: 3px;
+    bottom: 3px;
+    background: #ff9412;
+    color: #ebe0ca;
+    padding: 6px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: visible;
+    z-index: 1;
+}
