@@ -14,3 +14,5 @@ $CFG->t1_client_secret = 'omitted';
 $CFG->t1_api_base = 'https://T1-address.com/T1Default/CiAnywhere/Web/KOIT1SMS';
 ```
 You can find these fields in T1>Site settings>Oauth idp credentials.
+
+You will also need to add a navigation item to the navbar, to allow users to reach the plugin's pages. You can do this in Site Admin > Appearance > Advanced Theme Settings > Custom menu. You only need to add index.php, as it links to the other page.
